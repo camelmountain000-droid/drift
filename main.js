@@ -5,7 +5,7 @@ async function fetchRandom() {
   for (let i = 0; i < 10; i++) {
     const res = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary')
     const data = await res.json()
-    if (data.thumbnail) return data
+    if (data.thumbnail && data.type === "standard" && !isBlocked(data)) return data
   }
   return null
 }
@@ -48,3 +48,8 @@ feed.addEventListener('scroll', () => {
 })
 
 loadMore(5)
+
+const BLOCKED = new RegExp('\\b(porn|pornography|erotic|nude|nudity|genitals?|rape|rapist|fetish|escort|stripper|gore|torture|suicide)\\b', 'i')
+function isBlocked(d) {
+  return BLOCKED.test(d.title + ' ' + (d.extract || ''))
+}
